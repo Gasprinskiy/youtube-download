@@ -19,26 +19,12 @@ services:
     networks:
       - dev
 
-  # client:
-  #   build:
-  #     context: ./client
-  #   container_name: dev_client
-  #   tty: true
-  #   restart: unless-stopped
-  #   working_dir: /app
-  #   ports:
-  #     - "8080:8080"
-  #   volumes:
-  #     - ./client:/app
-  #     - /app/node_modules
-  #   command: npm run preview
-  #   networks:
-  #     - dev
-
   nginx:
     image: nginx:stable-alpine
     container_name: nginx
     restart: always
+    environment:
+      - PROD=true
     ports:
       - "80:80"
     volumes: 

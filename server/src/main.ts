@@ -1,5 +1,7 @@
 import { NestFactory } from '@nestjs/core';
+
 import { AppModule } from './app.module';
+import { getCorsOrigin } from './shared/utils/env'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -7,7 +9,7 @@ async function bootstrap() {
   app.enableCors(
     {
       allowedHeaders: ['content-type'],
-      origin: 'http://localhost',
+      origin: getCorsOrigin(),
       credentials: true,
     }
   )

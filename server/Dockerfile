@@ -11,11 +11,9 @@ FROM node:18.20
 
 WORKDIR /app
 
-# Копируем package.json и устанавливаем зависимости
 COPY package*.json ./
 RUN npm install
 
-# Копируем все остальные файлы
 COPY . .
 
 # Собираем приложение

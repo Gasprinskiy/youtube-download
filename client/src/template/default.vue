@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { shallowRef } from 'vue';
 
-import { 
-  NLoadingBarProvider, 
-  NConfigProvider, 
+import {
+  NLoadingBarProvider,
+  NConfigProvider,
   NNotificationProvider,
   NMessageProvider,
   NGlobalStyle,
@@ -15,15 +15,14 @@ import {
   darkTheme,
   lightTheme,
 } from 'naive-ui';
-import { BuiltInGlobalTheme } from 'naive-ui/es/themes/interface';
+import type { BuiltInGlobalTheme } from 'naive-ui/es/themes/interface';
 import { MoonOutline, SunnyOutline, LogoYoutube } from '@vicons/ionicons5';
 
-const currentThemeSwitchValue = shallowRef<boolean>(true)
-const currentTheme = shallowRef<BuiltInGlobalTheme>(darkTheme)
+const currentThemeSwitchValue = shallowRef<boolean>(true);
+const currentTheme = shallowRef<BuiltInGlobalTheme>(darkTheme);
 
-
-function onChangeTheme(value: boolean) : void {
-  currentTheme.value = value ? darkTheme : lightTheme
+function onChangeTheme(value: boolean): void {
+  currentTheme.value = value ? darkTheme : lightTheme;
 }
 </script>
 
@@ -32,11 +31,10 @@ function onChangeTheme(value: boolean) : void {
     <NLoadingBarProvider>
       <NNotificationProvider>
         <NMessageProvider placement="bottom">
-
           <div class="app-container">
             <NLayoutHeader class="app-container__header">
               <h1 class="app-container__title">
-                Скачать из 
+                Скачать из
                 <span>
                   <NIcon
                     :component="LogoYoutube"
@@ -46,26 +44,26 @@ function onChangeTheme(value: boolean) : void {
                 </span>
               </h1>
               <NSwitch
-                size="large"
                 v-model:value="currentThemeSwitchValue"
+                size="large"
                 @update-value="onChangeTheme"
               >
                 <template #checked-icon>
-                  <n-icon :component="MoonOutline" />
+                  <NIcon :component="MoonOutline" />
                 </template>
                 <template #unchecked-icon>
-                  <n-icon :component="SunnyOutline" />
+                  <NIcon :component="SunnyOutline" />
                 </template>
               </NSwitch>
             </NLayoutHeader>
             <div class="app-container__inner">
               <NScrollbar>
-                <slot/>
+                <slot />
               </NScrollbar>
             </div>
           </div>
 
-          <NGlobalStyle/>
+          <NGlobalStyle />
         </NMessageProvider>
       </NNotificationProvider>
     </NLoadingBarProvider>
@@ -98,11 +96,10 @@ function onChangeTheme(value: boolean) : void {
       }
     }
 
-    &__inner { 
+    &__inner {
       max-width: 1000px;
       padding: 30px 20px;
       margin: auto;
     }
   }
 </style>
-

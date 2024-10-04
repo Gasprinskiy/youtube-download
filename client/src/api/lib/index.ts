@@ -1,7 +1,9 @@
-import { ofetch } from "ofetch";
+import { ofetch } from 'ofetch';
+
+import { getApiUrl } from '../../shared/utils/env';
 
 export const $api = ofetch.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: getApiUrl(),
   timeout: 180000,
   credentials: 'include',
-})
+});

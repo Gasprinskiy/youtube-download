@@ -1,46 +1,46 @@
 <script setup lang="ts">
-import { computed, shallowRef } from "vue";
+import { computed, shallowRef } from 'vue';
 
-import { NInput, NButton, NIcon, useMessage } from "naive-ui"
-import { SearchOutline } from '@vicons/ionicons5'
-import { useVuelidate } from '@vuelidate/core'
-import { required, url } from '@vuelidate/validators'
-import { FormValidationStatus } from "naive-ui/es/form/src/interface";
+import { NInput, NButton, NIcon, useMessage } from 'naive-ui';
+import { SearchOutline } from '@vicons/ionicons5';
+import { useVuelidate } from '@vuelidate/core';
+import { required, url } from '@vuelidate/validators';
+import type { FormValidationStatus } from 'naive-ui/es/form/src/interface';
 
 const emit = defineEmits<{
-  onSubmit: [url: string]
-}>()
+  onSubmit: [url: string];
+}>();
 
-const message = useMessage()
+const message = useMessage();
 
-const searchUrl = shallowRef<string>('https://www.youtube.com/watch?v=ZdtCw5d7e40&t=242s')
-const hasError = shallowRef<boolean>(false)
+const searchUrl = shallowRef<string>('');
+const hasError = shallowRef<boolean>(false);
 
-const inputErrStatus = computed<FormValidationStatus>(() => hasError.value ? 'error' : 'success')
+const inputErrStatus = computed<FormValidationStatus>(() => hasError.value ? 'error' : 'success');
 
 const validateRules = {
-  searchUrl: {required, url}
-}
+  searchUrl: { required, url },
+};
 
-const $v = useVuelidate(validateRules, { searchUrl })
+const $v = useVuelidate(validateRules, { searchUrl });
 
-function onSubmit() {
-  $v.value.$validate()
+function onSubmit(): void {
+  $v.value.$validate();
 
-  hasError.value = $v.value.$dirty && $v.value.$invalid
+  hasError.value = $v.value.$dirty && $v.value.$invalid;
 
   if (hasError.value) {
-    message.error('Не верный url видео', )
-    return
+    message.error('Не верный url видео');
+    return;
   }
 
-  emit('onSubmit', searchUrl.value)
+  emit('onSubmit', searchUrl.value);
 }
 </script>
 
 <template>
   <div class="search-input">
-    <NInput 
+    <NInput
       v-model:value="searchUrl"
       type="text"
       placeholder="Введите url видео"

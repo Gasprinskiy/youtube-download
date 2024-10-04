@@ -4,16 +4,15 @@ import { computed } from 'vue';
 import { NIcon } from 'naive-ui';
 import { LogoYoutube } from '@vicons/ionicons5';
 
-import { AppServiceVideoDownloadOptions } from '../api/types';
+import type { AppServiceVideoDownloadOptions } from '../api/types';
 
+const props = defineProps<AppServiceVideoDownloadOptions>();
 
-const props = defineProps<AppServiceVideoDownloadOptions>()
-
-const title = computed<string>(() => `${props.quality}p/${props.fps}FPS[${props.extension}]`)
+const title = computed<string>(() => `${props.quality}p/${props.fps}FPS[${props.extension}]`);
 const formattedSize = computed<string>(() => {
-  const size = Math.floor(props.size / 1_000_000)
-  return `${size} МБ`
-})
+  const size = Math.floor(props.size / 1_000_000);
+  return `${size} МБ`;
+});
 </script>
 
 <template>
@@ -49,5 +48,4 @@ const formattedSize = computed<string>(() => {
       gap: 5px;
     }
   }
-
 </style>
