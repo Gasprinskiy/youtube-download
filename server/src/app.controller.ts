@@ -7,19 +7,12 @@ export class AppController {
   constructor(private readonly downloadService: DowloadsService) { }
 
   @Get('/options/:id')
-  async getDownloadOptions(@Param('id') id: string): Promise<AppServiceVideoInfo> {
-    console.log('id: ', id);
-
-    const shit = await this.downloadService.getDownloadOptions(id)
-    console.log('shit: ', shit);
-    return shit
-
+  getDownloadOptions(@Param('id') id: string): Promise<AppServiceVideoInfo> {
+    return this.downloadService.getDownloadOptions(id)
   }
 
   @Get('/download_link')
-  async prepare(@Query() query: PrepareVideoParams): Promise<string> {
-    console.log('query: ', query);
-
+  prepare(@Query() query: PrepareVideoParams): Promise<string> {
     return this.downloadService.prepareVideo(query)
   }
 }

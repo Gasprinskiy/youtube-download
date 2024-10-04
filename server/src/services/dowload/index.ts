@@ -17,7 +17,6 @@ export class DowloadsService {
     const info = await this.getVideoFormats(url)
 
     const formats = info.formats as Array<any>
-    console.log('formats: ', formats);
 
     const filteredDownloadOption = formats.filter(item => {
       const isSatisfyingQuality = item.height > 360
