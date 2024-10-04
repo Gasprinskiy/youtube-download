@@ -8,6 +8,8 @@ export class AppController {
 
   @Get('/options/:id')
   async getDownloadOptions(@Param('id') id: string): Promise<AppServiceVideoInfo> {
+    console.log('id: ', id);
+
     const shit = await this.downloadService.getDownloadOptions(id)
     console.log('shit: ', shit);
     return shit

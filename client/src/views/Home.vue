@@ -3,23 +3,16 @@ import {
   NCard, 
   NCollapseTransition, 
   useLoadingBar, 
-  NImage,
-  NInput, 
-  NSelect,
-  NButton,
-  NIcon,
 
-  SelectOption,
   useNotification,
 } from 'naive-ui';
-import { DownloadOutline } from '@vicons/ionicons5';
 
 import SearchInput from '../components/SearchInput.vue'
-import DownloadOption from '../components/DownloadOption.vue'
+// import DownloadOption from '../components/DownloadOption.vue'
 
-import { getDownloadLink, getDownloadOptions } from '../api';
-import { computed, h, shallowRef, VNode } from 'vue';
-import { AppServiceVideoInfo, AppServiceVideoDownloadOptions } from '../api/types';
+import {  getDownloadOptions } from '../api';
+import { computed, shallowRef } from 'vue';
+import { AppServiceVideoInfo } from '../api/types';
 import SearchResult from '../components/SearchResult.vue';
 
 const notification = useNotification()
@@ -31,9 +24,9 @@ const currentUrl = shallowRef<string>('')
 const chosenOptionID = shallowRef<string | undefined>()
 
 const showData = computed<boolean>(() => data.value !== null)
-const downloadOptions = computed<SelectOption[]>(() => {
-  return data.value ? mapDownloadOptions(data.value.download_options) : []
-})
+// const downloadOptions = computed<SelectOption[]>(() => {
+//   return data.value ? mapDownloadOptions(data.value.download_options) : []
+// })
 
 async function onInputSubmit(url: string) {  
   data.value = null
@@ -59,49 +52,49 @@ async function onInputSubmit(url: string) {
   }
 }
 
-async function onDownloadClicked() {
-  loading.start()
-  try {    
-    const chosenOption = data.value?.download_options.find(option => option.id === chosenOptionID.value)
-    console.log(chosenOption);
+// async function onDownloadClicked() {
+//   loading.start()
+//   try {    
+//     const chosenOption = data.value?.download_options.find(option => option.id === chosenOptionID.value)
+//     console.log(chosenOption);
     
-    const link = await getDownloadLink({
-      id: chosenOptionID.value || '',
-      quality: chosenOption?.quality,
-      file_name: fileName.value || 'suka'
-    })
-    console.log('link: ', link);
+//     const link = await getDownloadLink({
+//       id: chosenOptionID.value || '',
+//       quality: chosenOption?.quality || 360,
+//       file_name: fileName.value || 'suka'
+//     })
+//     console.log('link: ', link);
     
-    loading.finish()
-  } catch(e) {
-    notification.error({
-      title: 'Внутренняя ошибка сервера, попробуйте позже',
-      duration: 3000
-    })
-    loading.error()
-  }
-}
+//     loading.finish()
+//   } catch(e) {
+//     notification.error({
+//       title: 'Внутренняя ошибка сервера, попробуйте позже',
+//       duration: 3000
+//     })
+//     loading.error()
+//   }
+// }
 
-function mapDownloadOptions(data: AppServiceVideoDownloadOptions[]): SelectOption[] {
-  return data.map(option => ({
-    label: option.quality.toString(),
-    value: option.id
-  }))
-}
+// function mapDownloadOptions(data: AppServiceVideoDownloadOptions[]): SelectOption[] {
+//   return data.map(option => ({
+//     label: option.quality.toString(),
+//     value: option.id
+//   }))
+// }
 
-function renderLabel(option: SelectOption): VNode | undefined {
-  const props = data.value?.download_options.find(item => item.id === option.value)
-  if (!props) {
-    return
-  }
+// function renderLabel(option: SelectOption): VNode | undefined {
+//   const props = data.value?.download_options.find(item => item.id === option.value)
+//   if (!props) {
+//     return
+//   }
 
-  return h(DownloadOption, 
-    { 
-      style: 'width: 100%',
-      ...props 
-    }
-  )
-}
+//   return h(DownloadOption, 
+//     { 
+//       style: 'width: 100%',
+//       ...props 
+//     }
+//   )
+// }
 </script>
 
 <template>

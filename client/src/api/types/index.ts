@@ -14,6 +14,6 @@ export interface AppServiceVideoInfo {
 
 export interface PrepareVideoParams {
   id: string
-  quality: string
+  quality: number
   file_name: string
 }

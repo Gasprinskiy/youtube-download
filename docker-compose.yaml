@@ -1,0 +1,48 @@
+networks:
+  dev:
+    driver: bridge
+
+services:
+  server:
+    build:
+      context: ./server
+    container_name: dev_server
+    tty: true
+    restart: unless-stopped
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    command: npm run start:prod
+    networks:
+      - dev
+
+  # client:
+  #   build:
+  #     context: ./client
+  #   container_name: dev_client
+  #   tty: true
+  #   restart: unless-stopped
+  #   working_dir: /app
+  #   ports:
+  #     - "8080:8080"
+  #   volumes:
+  #     - ./client:/app
+  #     - /app/node_modules
+  #   command: npm run preview
+  #   networks:
+  #     - dev
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes: 
+      - ./nginx:/etc/nginx/conf.d/
+      - ./nginx/dist:/usr/share/nginx/html
+    networks:
+      - dev
