@@ -29,7 +29,7 @@ function onChangeTheme(value: boolean): void {
 <template>
   <NConfigProvider :theme="currentTheme">
     <NLoadingBarProvider>
-      <NNotificationProvider>
+      <NNotificationProvider placement="top-left">
         <NMessageProvider placement="bottom">
           <div class="app-container">
             <NLayoutHeader class="app-container__header">

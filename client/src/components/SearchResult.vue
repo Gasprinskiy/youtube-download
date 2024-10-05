@@ -117,6 +117,7 @@ function onDownloadClicked(): void {
       &_image {
         width: 50%;
         min-width: 480px;
+        height: 360px;
       }
 
       &_data {

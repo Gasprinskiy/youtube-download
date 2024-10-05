@@ -39,7 +39,7 @@ export class DowloadsService {
     }
   }
 
-  async prepareVideo(params: PrepareVideoParams): Promise<string> {
+  async prepareVideo(params: PrepareVideoParams): Promise<Buffer> {
     const { id, quality, file_name } = params
 
     const url = this.getUrl(id)
@@ -59,7 +59,7 @@ export class DowloadsService {
 
     queueMicrotask(() => this.setFileToRemove(rootPath))
 
-    return fileName
+    return fs.readFile(rootPath)
   }
 
   private async getVideoFormats(url: string): Promise<any> {

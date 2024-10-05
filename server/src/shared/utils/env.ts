@@ -3,5 +3,5 @@ export function isProd() {
 }
 
 export function getCorsOrigin() {
-  return isProd() ? process.env.PROD_ORIGIN : process.env.DEV_ORIGIN
+  return isProd() ? 'http://localhost' : 'http://localhost:3030'
 }

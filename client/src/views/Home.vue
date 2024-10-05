@@ -1,46 +1,125 @@
 <script setup lang="ts">
-import { computed, shallowRef } from 'vue';
+import type { VNode } from 'vue';
+import { h, shallowRef } from 'vue';
 
-import { NCard, NCollapseTransition, useLoadingBar, useNotification } from 'naive-ui';
+import type { NotificationReactive } from 'naive-ui';
+import { NButton, NCard, NCollapseTransition, useMessage, useNotification } from 'naive-ui';
 
 import SearchInput from '../components/SearchInput.vue';
-import { getDownloadOptions } from '../api';
-import type { AppServiceVideoInfo } from '../api/types';
+import { downloadVideo, getDownloadOptions } from '../api';
+import type { AppServiceVideoDownloadOptions, AppServiceVideoInfo } from '../api/types';
 import SearchResult from '../components/SearchResult.vue';
+import { getVideoUrl, startDownload } from '../shared/utils/download';
+import { useApiRequest } from '../composables/use-api-request.ts';
+
+const abortTitle = 'Прервать';
 
 const notification = useNotification();
-const loading = useLoadingBar();
+const message = useMessage();
+const { handleRequest, abortRequest } = useApiRequest();
 
 const data = shallowRef<AppServiceVideoInfo | null>(null);
-const fileName = shallowRef<string>('');
 const currentUrl = shallowRef<string>('');
-const chosenOptionID = shallowRef<string | undefined>();
-
-const showData = computed<boolean>(() => data.value !== null);
+const chosenOptionID = shallowRef<string>();
+const videoUrl = shallowRef<string>();
+const inProgressNotification = shallowRef<NotificationReactive>();
 
 async function onInputSubmit(url: string): Promise<void> {
-  data.value = null;
-  currentUrl.value = url;
+  const inProgressMessage = 'Идет поиск видео';
 
-  loading.start();
+  handleRequest({
+    request: (signal?: AbortSignal) => getDownloadOptions(url, signal),
 
-  try {
-    const options = await getDownloadOptions(url);
+    beforeRequestStart: () => {
+      inProgressNotification.value = notification.create({
+        title: inProgressMessage,
+        action: () => renderNotificationActionButton(
+          abortTitle,
+          () => {
+            inProgressNotification.value?.destroy();
+            abortRequest();
+          },
+        ),
+      });
+      data.value = null;
+      currentUrl.value = url;
+    },
 
-    data.value = options;
-    fileName.value = options.name;
-    chosenOptionID.value = options.download_options[0].id;
+    afterRequestFinished: (result: AppServiceVideoInfo) => {
+      data.value = result;
+      chosenOptionID.value = result.download_options[0].id;
+      inProgressNotification.value?.destroy();
+    },
 
-    loading.finish();
-  } catch (e) {
-    notification.error({
-      title: 'Внутренняя ошибка сервера, попробуйте позже',
-      duration: 3000,
-    });
-    console.error(e);
-    loading.error();
-  }
+    onTryRequestWithLoadingInProgress: () => {
+      message.warning(inProgressMessage);
+    },
+
+    onRequestError: () => {
+      inProgressNotification.value?.destroy();
+    },
+  });
 }
+
+async function onDownloadClicked(result: {
+  fileName: string;
+  option: AppServiceVideoDownloadOptions;
+}): Promise<void> {
+  const { fileName, option } = result;
+  const inProgressMessage = 'Идет подготовка видео';
+
+  handleRequest({
+    request: (signal?: AbortSignal) => {
+      const params = {
+        id: option.id,
+        quality: option.quality,
+        file_name: fileName,
+      };
+      return downloadVideo(params, signal);
+    },
+
+    beforeRequestStart: () => {
+      inProgressNotification.value = notification.create({
+        title: inProgressMessage,
+        action: () => renderNotificationActionButton(
+          abortTitle,
+          () => {
+            inProgressNotification.value?.destroy();
+            abortRequest();
+          },
+        ),
+      });
+    },
+
+    afterRequestFinished: (result: Blob) => {
+      startDownload(result, fileName);
+      videoUrl.value = getVideoUrl(`${fileName}.${option.extension}`);
+      inProgressNotification.value?.destroy();
+      message.success('Загрузка видео началась');
+    },
+
+    onTryRequestWithLoadingInProgress: () => {
+      message.warning(inProgressMessage);
+    },
+
+    onRequestError: () => {
+      inProgressNotification.value?.destroy();
+    },
+  });
+}
+
+function renderNotificationActionButton(
+  title: string,
+  onClick: () => void,
+): VNode {
+  return h(NButton, {
+    text: true,
+    type: 'primary',
+    onClick,
+  }, {
+    default: () => title,
+  });
+};
 </script>
 
 <template>
@@ -50,11 +129,27 @@ async function onInputSubmit(url: string): Promise<void> {
         @on-submit="onInputSubmit"
       />
     </NCard>
-    <NCollapseTransition :show="showData">
+
+    <NCollapseTransition :show="!!data">
       <SearchResult
         v-if="data"
         :data="data"
+        @on-download-clicked="onDownloadClicked"
       />
+    </NCollapseTransition>
+
+    <NCollapseTransition :show="!!videoUrl">
+      <NCard>
+        <h4>
+          Если загрузка видео не началась, вы можете получить доступ к видео по
+          <a
+            :href="videoUrl" target="_blank"
+          >
+            ссылке
+          </a>
+          в течении 30 минут
+        </h4>
+      </NCard>
     </NCollapseTransition>
   </div>
 </template>

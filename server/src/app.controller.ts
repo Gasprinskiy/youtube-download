@@ -1,6 +1,7 @@
-import { Controller, Param, Get, Query } from '@nestjs/common';
+import { Controller, Param, Get, Query, Res } from '@nestjs/common';
 import { DowloadsService } from './services/dowload';
 import { AppServiceVideoInfo, PrepareVideoParams } from './shared/service/download/types';
+import { Response } from 'express';
 
 @Controller()
 export class AppController {
@@ -11,8 +12,10 @@ export class AppController {
     return this.downloadService.getDownloadOptions(id)
   }
 
-  @Get('/download_link')
-  prepare(@Query() query: PrepareVideoParams): Promise<string> {
-    return this.downloadService.prepareVideo(query)
+  @Get('/download')
+  async prepare(@Query() query: PrepareVideoParams, @Res() res: Response): Promise<void> {
+    const buffer = await this.downloadService.prepareVideo(query)
+    res.contentType('mp4')
+    res.send(buffer)
   }
 }
