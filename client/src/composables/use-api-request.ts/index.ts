@@ -1,4 +1,4 @@
-import { useLoadingBar, useNotification, useMessage } from 'naive-ui';
+import { useLoadingBar, useMessage } from 'naive-ui';
 import { shallowRef } from 'vue';
 import type { HandleRequestOptions } from './types';
 
