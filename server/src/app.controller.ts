@@ -1,11 +1,15 @@
-import { Controller, Param, Get, Query, Res } from '@nestjs/common';
-import { DowloadsService } from './services/dowload';
+import { Controller, Param, Get, Query, Res, Req } from '@nestjs/common';
+
+import { Response, Request } from 'express';
+
+import { DownloadsService } from './services/dowload';
 import { AppServiceVideoInfo, PrepareVideoParams } from './shared/service/download/types';
-import { Response } from 'express';
+import { Fingerprint, IFingerprint } from 'nestjs-fingerprint';
 
 @Controller()
 export class AppController {
-  constructor(private readonly downloadService: DowloadsService) { }
+
+  constructor(private readonly downloadService: DownloadsService) { }
 
   @Get('/options/:id')
   getDownloadOptions(@Param('id') id: string): Promise<AppServiceVideoInfo> {
@@ -13,8 +17,24 @@ export class AppController {
   }
 
   @Get('/download')
-  async prepare(@Query() query: PrepareVideoParams, @Res() res: Response): Promise<void> {
-    const buffer = await this.downloadService.prepareVideo(query)
+  async prepare(
+    @Query() query: Omit<PrepareVideoParams, 'device_fingerprint'>,
+    @Res() res: Response,
+    @Fingerprint() fp: IFingerprint
+  ): Promise<void> {
+    const params: PrepareVideoParams = {
+      ...query,
+      device_fingerprint: fp.id
+    }
+    // req.on('close', async () => {
+    //   if (!res.headersSent) {
+    //     console.log('suction');
+
+    //     await this.downloadService.removePreparedVideo(params)
+    //   }
+    // })
+    const buffer = await this.downloadService.prepareVideo(params)
+
     res.contentType('mp4')
     res.send(buffer)
   }

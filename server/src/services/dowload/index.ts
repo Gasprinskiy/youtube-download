@@ -4,14 +4,14 @@ import { join } from 'path';
 import * as fs from 'node:fs/promises'
 
 import { PathToRoot } from '../shared/constants'
-
 import { FileLifeTime } from '../../shared/service/download/constants';
 import { youtubeDl } from '../../shared/youtube-dl';
 import { DownloadableFormatsIdMap } from '../../shared/youtube-dl/constants';
 import { AppServiceVideoDownloadOptions, AppServiceVideoInfo, PrepareVideoParams } from '../../shared/service/download/types';
 
 @Injectable()
-export class DowloadsService {
+export class DownloadsService {
+
   async getDownloadOptions(id: string): Promise<AppServiceVideoInfo> {
     const url = this.getUrl(id)
     const info = await this.getVideoFormats(url)
@@ -43,9 +43,7 @@ export class DowloadsService {
     const { id, quality, file_name } = params
 
     const url = this.getUrl(id)
-    const unicID = Date.now().toString(16)
-    const fileName = `${file_name}[${unicID}_${id}].mp4`
-    const rootPath = join(__dirname, PathToRoot, `/uploads/${fileName}`)
+    const rootPath = this.getFileRootPath(params)
 
     await youtubeDl.execPromise([
       url,
@@ -60,6 +58,23 @@ export class DowloadsService {
     queueMicrotask(() => this.setFileToRemove(rootPath))
 
     return fs.readFile(rootPath)
+  }
+
+  async removePreparedVideo(params: PrepareVideoParams): Promise<void> {
+    const rootPath = this.getFileRootPath(params)
+    try {
+      await fs.stat(rootPath)
+      await fs.unlink(rootPath)
+    } catch (_) {
+      return
+    }
+  }
+
+  private getFileRootPath(params: PrepareVideoParams): string {
+    const { id, file_name, device_fingerprint } = params
+
+    const fileName = `${file_name}[${device_fingerprint}_${id}].mp4`
+    return join(__dirname, PathToRoot, `/uploads/${fileName}`)
   }
 
   private async getVideoFormats(url: string): Promise<any> {

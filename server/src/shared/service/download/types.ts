@@ -16,6 +16,7 @@ export interface PrepareVideoParams {
   id: string
   quality: string
   file_name: string
+  device_fingerprint: string
 }
 
 export interface ParsedFormats {
