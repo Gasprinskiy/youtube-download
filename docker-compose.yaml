@@ -15,7 +15,7 @@ services:
     volumes:
       - ./server:/app
       - /app/node_modules
-    command: npm run start:prod
+    command: sh -c "npm run build && npm run start:prod"
     networks:
       - dev
 
