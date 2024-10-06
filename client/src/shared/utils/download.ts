@@ -1,6 +1,4 @@
-import { getApiUrl } from './env';
-
-export function startDownload(file: Blob, fileName: string): void {
+export function startDownload(file: Blob, fileName: string): string {
   const a = document.createElement('a');
   document.body.appendChild(a);
 
@@ -10,11 +8,7 @@ export function startDownload(file: Blob, fileName: string): void {
   a.download = fileName;
   a.click();
 
-  window.URL.revokeObjectURL(url);
   a.remove();
-}
 
-export function getVideoUrl(fileName: string): string {
-  const apiUrl = getApiUrl();
-  return `${apiUrl}/${fileName}`;
+  return url;
 }

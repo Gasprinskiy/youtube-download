@@ -9,7 +9,7 @@ import SearchInput from '../components/SearchInput.vue';
 import { downloadVideo, getDownloadOptions } from '../api';
 import type { AppServiceVideoDownloadOptions, AppServiceVideoInfo } from '../api/types';
 import SearchResult from '../components/SearchResult.vue';
-import { getVideoUrl, startDownload } from '../shared/utils/download';
+import { startDownload } from '../shared/utils/download';
 import { useApiRequest } from '../composables/use-api-request.ts';
 
 const abortTitle = 'Прервать';
@@ -21,7 +21,7 @@ const { handleRequest, abortRequest } = useApiRequest();
 const data = shallowRef<AppServiceVideoInfo | null>(null);
 const currentUrl = shallowRef<string>('');
 const chosenOptionID = shallowRef<string>();
-const videoUrl = shallowRef<string>();
+const videoUrl = shallowRef<string | null>();
 const inProgressNotification = shallowRef<NotificationReactive>();
 
 async function onInputSubmit(url: string): Promise<void> {
@@ -79,6 +79,7 @@ async function onDownloadClicked(result: {
     },
 
     beforeRequestStart: () => {
+      videoUrl.value = null;
       inProgressNotification.value = notification.create({
         title: inProgressMessage,
         action: () => renderNotificationActionButton(
@@ -92,8 +93,8 @@ async function onDownloadClicked(result: {
     },
 
     afterRequestFinished: (result: Blob) => {
-      startDownload(result, fileName);
-      videoUrl.value = getVideoUrl(`${fileName}.${option.extension}`);
+      const url = startDownload(result, fileName);
+      videoUrl.value = url;
       inProgressNotification.value?.destroy();
       message.success('Загрузка видео началась');
     },
@@ -140,15 +141,17 @@ function renderNotificationActionButton(
 
     <NCollapseTransition :show="!!videoUrl">
       <NCard>
-        <h4>
+        <p
+          v-if="videoUrl"
+          class="home-view__url-hint"
+        >
           Если загрузка видео не началась, вы можете получить доступ к видео по
           <a
             :href="videoUrl" target="_blank"
           >
             ссылке
           </a>
-          в течении 30 минут
-        </h4>
+        </p>
       </NCard>
     </NCollapseTransition>
   </div>
@@ -160,30 +163,10 @@ function renderNotificationActionButton(
     flex-direction: column;
     gap: 8px;
 
-    &__result {
-      width: 100%;
-      &_cover {
-        width: 100%;
-        display: flex;
-      }
-
-      &_image {
-        width: 50%;
-        min-width: 480px;
-      }
-
-      &_data {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        padding: 10px;
-        gap: 15px;
-      }
-
-      &_download-options {
-        display: flex;
-        gap: 8px;
-      }
+    &__url-hint {
+      text-align: center;
+      font-weight: 400;
+      font-size: 15px;
     }
   }
 </style>

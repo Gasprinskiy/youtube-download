@@ -2,8 +2,8 @@ import { useLoadingBar, useNotification, useMessage } from 'naive-ui';
 import { shallowRef } from 'vue';
 import type { HandleRequestOptions } from './types';
 
-const controller = new AbortController();
-const signal = controller.signal;
+let controller = new AbortController();
+let signal = controller.signal;
 
 const loading = shallowRef<boolean>(false);
 
@@ -41,11 +41,17 @@ export function useApiRequest() {
     controller.abort();
   }
 
+  function resetAbortController() {
+    controller = new AbortController();
+    signal = controller.signal;
+  }
+
   function handleError(e: unknown): void {
     if (signal.aborted) {
       message.warning('Запрос прерван');
 
       loadingBar.finish();
+      resetAbortController();
       return;
     }
 
