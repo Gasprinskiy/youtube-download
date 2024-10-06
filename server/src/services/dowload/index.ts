@@ -81,8 +81,7 @@ export class DownloadsService {
 
   private async getVideoFormats(url: string): Promise<any> {
     const listFormats = await youtubeDl.execPromise([
-      '--cookies-from-browser',
-      `firefox:${getFirefoxProfilePath()}`,
+      `--cookies-from-browser "firefox:${getFirefoxProfilePath()}"`,
       url,
       '--list-formats',
       '--dump-json'
