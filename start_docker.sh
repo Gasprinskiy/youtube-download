@@ -12,4 +12,5 @@ npm run build
 cp -r ./dist ../nginx/dist
 cd ../
 
-docker compose up
+docker compose build
+docker compose up -d --force-recreate --renew-anon-volumes
