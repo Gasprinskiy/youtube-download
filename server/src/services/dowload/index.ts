@@ -8,6 +8,7 @@ import { FileLifeTime } from '../../shared/service/download/constants';
 import { youtubeDl } from '../../shared/youtube-dl';
 import { DownloadableFormatsIdMap } from '../../shared/youtube-dl/constants';
 import { AppServiceVideoDownloadOptions, AppServiceVideoInfo, PrepareVideoParams } from '../../shared/service/download/types';
+import { getFirefoxProfilePath } from 'src/shared/utils/borwser-profile';
 
 @Injectable()
 export class DownloadsService {
@@ -40,13 +41,13 @@ export class DownloadsService {
   }
 
   async prepareVideo(params: PrepareVideoParams): Promise<Buffer> {
-    const { id, quality, file_name } = params
+    const { id, quality } = params
 
     const url = this.getUrl(id)
     const rootPath = this.getFileRootPath(params)
 
     await youtubeDl.execPromise([
-      '--cookies-from-browser', 'chrome',
+      '--cookies-from-browser', `firefox:${getFirefoxProfilePath()}`,
       url,
       '-f',
       `bestvideo[height=${quality}][vcodec^=avc]+bestaudio[ext=mp4]/best[height=${quality}][vcodec^=avc]`,
@@ -81,7 +82,7 @@ export class DownloadsService {
   private async getVideoFormats(url: string): Promise<any> {
     const listFormats = await youtubeDl.execPromise([
       '--cookies-from-browser',
-      'chrome',
+      `firefox:${getFirefoxProfilePath()}`,
       url,
       '--list-formats',
       '--dump-json'
