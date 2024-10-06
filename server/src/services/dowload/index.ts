@@ -46,6 +46,7 @@ export class DownloadsService {
     const rootPath = this.getFileRootPath(params)
 
     await youtubeDl.execPromise([
+      '--cookies-from-browser', 'chrome',
       url,
       '-f',
       `bestvideo[height=${quality}][vcodec^=avc]+bestaudio[ext=mp4]/best[height=${quality}][vcodec^=avc]`,
@@ -78,7 +79,13 @@ export class DownloadsService {
   }
 
   private async getVideoFormats(url: string): Promise<any> {
-    const listFormats = await youtubeDl.execPromise([url, '--list-formats', '--dump-json']);
+    const listFormats = await youtubeDl.execPromise([
+      '--cookies-from-browser',
+      'chrome',
+      url,
+      '--list-formats',
+      '--dump-json'
+    ]);
 
     const jsonRegexp = /{[\w\W]+?}$/gim
     const jsonMatch = jsonRegexp.exec(listFormats)
