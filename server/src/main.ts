@@ -6,8 +6,6 @@ import { getCorsOrigin } from './shared/utils/env'
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  console.log(getCorsOrigin());
-
   app.enableCors(
     {
       allowedHeaders: ['content-type'],
@@ -18,6 +16,7 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   await app.listen(3000);
+  console.log('pidaras blyat');
 }
 
 bootstrap();
