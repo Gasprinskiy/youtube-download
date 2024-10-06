@@ -13,6 +13,7 @@ WORKDIR /app
 
 COPY package*.json ./
 RUN rm -rf node_modules
+RUN rm -fr dist
 RUN npm install
 
 COPY . .
