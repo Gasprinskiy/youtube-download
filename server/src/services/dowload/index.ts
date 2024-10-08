@@ -47,7 +47,8 @@ export class DownloadsService {
     const rootPath = this.getFileRootPath(params)
 
     await youtubeDl.execPromise([
-      '--cookies-from-browser', 'firefox',
+      '--cookies-from-browser',
+      `firefox:${getFirefoxProfilePath()}`,
       url,
       '-f',
       `bestvideo[height=${quality}][vcodec^=avc]+bestaudio[ext=mp4]/best[height=${quality}][vcodec^=avc]`,
