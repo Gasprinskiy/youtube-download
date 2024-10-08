@@ -66,6 +66,7 @@ async function onDownloadClicked(result: {
 }): Promise<void> {
   const { fileName, option } = result;
   const inProgressMessage = 'Идет подготовка видео';
+  const inProgressDescription = 'Время подготовки зависит от размера видео';
 
   handleRequest({
     request: (signal?: AbortSignal) => {
@@ -80,6 +81,7 @@ async function onDownloadClicked(result: {
     beforeRequestStart: () => {
       inProgressNotification.value = notification.create({
         title: inProgressMessage,
+        description: inProgressDescription,
         action: () => renderNotificationActionButton(
           abortTitle,
           () => {
