@@ -27,7 +27,6 @@ export class AppController {
       device_fingerprint: fp.id
     }
     const buffer = await this.downloadService.prepareVideo(params)
-    console.log('buffer: ', buffer);
 
     res.contentType('mp4')
     res.send(buffer)
