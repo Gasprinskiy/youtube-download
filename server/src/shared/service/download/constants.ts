@@ -1,1 +1,1 @@
-export const FileLifeTime = 1800000 as const
+export const FileLifeTime = 300 as const
