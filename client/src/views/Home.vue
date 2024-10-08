@@ -25,12 +25,12 @@ const chosenOptionID = shallowRef<string>();
 const inProgressNotification = shallowRef<NotificationReactive>();
 
 async function onInputSubmit(url: string): Promise<void> {
-  inProgressMessage.value = 'Идет поиск видео';
-
   handleRequest({
     request: (signal?: AbortSignal) => getDownloadOptions(url, signal),
 
     beforeRequestStart: () => {
+      inProgressMessage.value = 'Идет поиск видео';
+
       inProgressNotification.value = notification.create({
         title: inProgressMessage.value,
         action: () => renderNotificationActionButton(
@@ -65,7 +65,6 @@ async function onDownloadClicked(result: {
   fileName: string;
   option: AppServiceVideoDownloadOptions;
 }): Promise<void> {
-  inProgressMessage.value = 'Идет подготовка видео';
   const { fileName, option } = result;
   const inProgressDescription = 'Время подготовки зависит от размера видео';
 
@@ -80,6 +79,8 @@ async function onDownloadClicked(result: {
     },
 
     beforeRequestStart: () => {
+      inProgressMessage.value = 'Идет подготовка видео';
+
       inProgressNotification.value = notification.create({
         title: inProgressMessage.value,
         description: inProgressDescription,
