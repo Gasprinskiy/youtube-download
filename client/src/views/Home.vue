@@ -20,18 +20,19 @@ const { handleRequest, abortRequest } = useApiRequest();
 
 const data = shallowRef<AppServiceVideoInfo | null>(null);
 const currentUrl = shallowRef<string>('');
+const inProgressMessage = shallowRef<string>('');
 const chosenOptionID = shallowRef<string>();
 const inProgressNotification = shallowRef<NotificationReactive>();
 
 async function onInputSubmit(url: string): Promise<void> {
-  const inProgressMessage = 'Идет поиск видео';
+  inProgressMessage.value = 'Идет поиск видео';
 
   handleRequest({
     request: (signal?: AbortSignal) => getDownloadOptions(url, signal),
 
     beforeRequestStart: () => {
       inProgressNotification.value = notification.create({
-        title: inProgressMessage,
+        title: inProgressMessage.value,
         action: () => renderNotificationActionButton(
           abortTitle,
           () => {
@@ -51,7 +52,7 @@ async function onInputSubmit(url: string): Promise<void> {
     },
 
     onTryRequestWithLoadingInProgress: () => {
-      message.warning(inProgressMessage);
+      message.warning(inProgressMessage.value);
     },
 
     onRequestError: () => {
@@ -64,8 +65,8 @@ async function onDownloadClicked(result: {
   fileName: string;
   option: AppServiceVideoDownloadOptions;
 }): Promise<void> {
+  inProgressMessage.value = 'Идет подготовка видео';
   const { fileName, option } = result;
-  const inProgressMessage = 'Идет подготовка видео';
   const inProgressDescription = 'Время подготовки зависит от размера видео';
 
   handleRequest({
@@ -80,7 +81,7 @@ async function onDownloadClicked(result: {
 
     beforeRequestStart: () => {
       inProgressNotification.value = notification.create({
-        title: inProgressMessage,
+        title: inProgressMessage.value,
         description: inProgressDescription,
         action: () => renderNotificationActionButton(
           abortTitle,
@@ -99,7 +100,7 @@ async function onDownloadClicked(result: {
     },
 
     onTryRequestWithLoadingInProgress: () => {
-      message.warning(inProgressMessage);
+      message.warning(inProgressMessage.value);
     },
 
     onRequestError: () => {
