@@ -1,7 +1,8 @@
 import { DownloadsService } from './dowload'
-import { ShutdownService } from './lifesycle'
+import { ShutdownService, WarmupService } from './lifesycle'
 
 export default [
   DownloadsService,
   ShutdownService,
+  WarmupService
 ]
