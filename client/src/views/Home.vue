@@ -9,7 +9,7 @@ import SearchInput from '../components/SearchInput.vue';
 import { downloadVideo, getDownloadOptions } from '../api';
 import type { AppServiceVideoDownloadOptions, AppServiceVideoInfo } from '../api/types';
 import SearchResult from '../components/SearchResult.vue';
-import { startDownload } from '../shared/utils/download';
+import { downloadBlob } from '../shared/utils/download';
 import { useApiRequest } from '../composables/use-api-request.ts';
 
 const abortTitle = 'Прервать';
@@ -21,7 +21,6 @@ const { handleRequest, abortRequest } = useApiRequest();
 const data = shallowRef<AppServiceVideoInfo | null>(null);
 const currentUrl = shallowRef<string>('');
 const chosenOptionID = shallowRef<string>();
-const videoUrl = shallowRef<string | null>();
 const inProgressNotification = shallowRef<NotificationReactive>();
 
 async function onInputSubmit(url: string): Promise<void> {
@@ -79,7 +78,6 @@ async function onDownloadClicked(result: {
     },
 
     beforeRequestStart: () => {
-      videoUrl.value = null;
       inProgressNotification.value = notification.create({
         title: inProgressMessage,
         action: () => renderNotificationActionButton(
@@ -93,8 +91,7 @@ async function onDownloadClicked(result: {
     },
 
     afterRequestFinished: (result: Blob) => {
-      const url = startDownload(result, fileName);
-      videoUrl.value = url;
+      downloadBlob(result, fileName);
       inProgressNotification.value?.destroy();
       message.success('Загрузка видео началась');
     },
@@ -137,22 +134,6 @@ function renderNotificationActionButton(
         :data="data"
         @on-download-clicked="onDownloadClicked"
       />
-    </NCollapseTransition>
-
-    <NCollapseTransition :show="!!videoUrl">
-      <NCard>
-        <p
-          v-if="videoUrl"
-          class="home-view__url-hint"
-        >
-          Если загрузка видео не началась, вы можете получить доступ к видео по
-          <a
-            :href="videoUrl" target="_blank"
-          >
-            ссылке
-          </a>
-        </p>
-      </NCard>
     </NCollapseTransition>
   </div>
 </template>
