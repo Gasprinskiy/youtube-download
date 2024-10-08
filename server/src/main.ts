@@ -16,7 +16,6 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   await app.listen(3000);
-  console.log('pidaras blyat');
 }
 
 bootstrap();
