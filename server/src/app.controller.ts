@@ -26,14 +26,8 @@ export class AppController {
       ...query,
       device_fingerprint: fp.id
     }
-    // req.on('close', async () => {
-    //   if (!res.headersSent) {
-    //     console.log('suction');
-
-    //     await this.downloadService.removePreparedVideo(params)
-    //   }
-    // })
     const buffer = await this.downloadService.prepareVideo(params)
+    console.log('buffer: ', buffer);
 
     res.contentType('mp4')
     res.send(buffer)
