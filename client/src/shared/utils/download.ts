@@ -1,8 +1,7 @@
 export function downloadBlob(file: Blob, fileName: string): void {
   const a = document.createElement('a');
-  document.body.appendChild(a);
-
   const url = window.URL.createObjectURL(file);
+  document.body.appendChild(a);
 
   a.href = url;
   a.download = fileName;

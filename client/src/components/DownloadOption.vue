@@ -11,7 +11,7 @@ const props = defineProps<AppServiceVideoDownloadOptions>();
 const title = computed<string>(() => `${props.quality}p/${props.fps}FPS[${props.extension}]`);
 const formattedSize = computed<string>(() => {
   const size = Math.floor(props.size / 1_000_000);
-  return `${size} МБ`;
+  return `~ ${size} МБ`;
 });
 </script>
 

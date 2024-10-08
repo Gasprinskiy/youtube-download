@@ -93,7 +93,7 @@ async function onDownloadClicked(result: {
     },
 
     afterRequestFinished: (result: Blob) => {
-      downloadBlob(result, fileName);
+      downloadBlob(result, `${fileName}.${option.extension}`);
       inProgressNotification.value?.destroy();
       message.success('Загрузка видео началась');
     },

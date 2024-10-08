@@ -4,6 +4,6 @@ import { getApiUrl } from '../../shared/utils/env';
 
 export const $api = ofetch.create({
   baseURL: getApiUrl(),
-  timeout: 180000,
+  timeout: 300000,
   credentials: 'include',
 });
