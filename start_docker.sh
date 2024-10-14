@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # node -v
-whoami
+which -a node
 
 cd ./nginx
 rm -rf dist
