@@ -17,11 +17,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: ./youtube-download/client  # Укажи путь к проекту, если нужен
+        working-directory: /client  # Укажи путь к проекту, если нужен
   
       - name: Build project
         run: npm run build
-        working-directory: ./youtube-download/client
+        working-directory: /client
 
       - name: Run deployment commands on server
         uses: appleboy/ssh-action@v0.1.4
@@ -32,5 +32,4 @@ jobs:
           script: |
             cd ./youtube-download
             git pull
-            docker-compose down
             ./start_docker.sh
