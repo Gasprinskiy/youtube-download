@@ -1,5 +1,7 @@
 #!/bin/bash
 
+node -v
+
 cd ./nginx
 rm -rf dist
 
