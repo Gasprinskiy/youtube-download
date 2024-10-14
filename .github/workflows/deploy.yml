@@ -17,11 +17,11 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        working-directory: /client  # Укажи путь к проекту, если нужен
+        working-directory: './client/'  # Укажи путь к проекту, если нужен
   
       - name: Build project
         run: npm run build
-        working-directory: /client
+        working-directory: ./client
 
       - name: Run deployment commands on server
         uses: appleboy/ssh-action@v0.1.4
