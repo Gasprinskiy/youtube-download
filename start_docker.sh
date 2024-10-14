@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # node -v
-command -v nvm
+which node
 
 cd ./nginx
 rm -rf dist
