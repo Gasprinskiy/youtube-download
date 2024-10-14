@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # node -v
-echo $PATH
+whoami
 
 cd ./nginx
 rm -rf dist
