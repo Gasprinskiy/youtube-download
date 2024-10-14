@@ -1,6 +1,7 @@
 #!/bin/bash
 
-node -v
+# node -v
+echo $PATH
 
 cd ./nginx
 rm -rf dist
