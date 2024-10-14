@@ -17,10 +17,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            sudo apt update
-            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-            nvm install 18.20.4
-            nvm use 18.20.4
             cd ./youtube-download
             git pull
-            ./start_docker.sh
+            echo '' | sudo ./start_docker.sh
