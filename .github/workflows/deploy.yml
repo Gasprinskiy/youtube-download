@@ -19,4 +19,4 @@ jobs:
           script: |
             cd ./youtube-download
             git pull
-            echo '' | sudo ./start_docker.sh
+            sudo ./start_docker.sh
