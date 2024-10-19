@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# node -v
-which node
-
 cd ./nginx
 rm -rf dist
 

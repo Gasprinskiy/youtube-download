@@ -20,9 +20,18 @@ import { MoonOutline, SunnyOutline, LogoYoutube } from '@vicons/ionicons5';
 
 const currentThemeSwitchValue = shallowRef<boolean>(true);
 const currentTheme = shallowRef<BuiltInGlobalTheme>(darkTheme);
+const isLightTheme = shallowRef<boolean>(false);
 
 function onChangeTheme(value: boolean): void {
   currentTheme.value = value ? darkTheme : lightTheme;
+
+  if (currentTheme.value.name === 'light') {
+    setTimeout(() => {
+      isLightTheme.value = true;
+    }, 200);
+    return;
+  }
+  isLightTheme.value = false;
 }
 </script>
 
@@ -32,7 +41,10 @@ function onChangeTheme(value: boolean): void {
       <NNotificationProvider placement="top-left">
         <NMessageProvider placement="bottom">
           <div class="app-container">
-            <NLayoutHeader class="app-container__header">
+            <NLayoutHeader
+              class="app-container__header"
+              :class="{ outlined: isLightTheme }"
+            >
               <h1 class="app-container__title">
                 Скачать из
                 <span>
@@ -43,6 +55,7 @@ function onChangeTheme(value: boolean): void {
                   YouTube
                 </span>
               </h1>
+
               <NSwitch
                 v-model:value="currentThemeSwitchValue"
                 size="large"
@@ -51,11 +64,13 @@ function onChangeTheme(value: boolean): void {
                 <template #checked-icon>
                   <NIcon :component="MoonOutline" />
                 </template>
+
                 <template #unchecked-icon>
                   <NIcon :component="SunnyOutline" />
                 </template>
               </NSwitch>
             </NLayoutHeader>
+
             <div class="app-container__inner">
               <NScrollbar>
                 <slot />
@@ -79,6 +94,9 @@ function onChangeTheme(value: boolean): void {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      &.outlined {
+        outline: 1px solid rgb(239, 239, 245);
+      }
     }
 
     &__title {
@@ -100,6 +118,16 @@ function onChangeTheme(value: boolean): void {
       max-width: 1000px;
       padding: 30px 20px;
       margin: auto;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .app-container {
+
+      &__title {
+        font-size: 20px;
+      }
+
     }
   }
 </style>

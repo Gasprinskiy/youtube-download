@@ -48,4 +48,12 @@ const formattedSize = computed<string>(() => {
       gap: 5px;
     }
   }
+
+  @media (max-width: 370px) {
+    .download-option {
+      &__size {
+        display: none;
+      }
+    }
+  }
 </style>

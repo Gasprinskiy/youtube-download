@@ -126,7 +126,7 @@ function renderNotificationActionButton(
 
 <template>
   <div class="home-view">
-    <NCard>
+    <NCard class="home-view__search-input">
       <SearchInput
         @on-submit="onInputSubmit"
       />
@@ -142,16 +142,20 @@ function renderNotificationActionButton(
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
   .home-view {
     display: flex;
     flex-direction: column;
     gap: 8px;
 
-    &__url-hint {
-      text-align: center;
-      font-weight: 400;
-      font-size: 15px;
+    &__search-input  {
+      .n-card__content {
+        padding: 10px;
+      }
+    }
+
+    .n-card > .n-card__content:first-child, .n-card > .n-card__footer:first-child {
+      padding-top: 10px;
     }
   }
 </style>

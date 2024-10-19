@@ -39,7 +39,10 @@ function onSubmit(): void {
 </script>
 
 <template>
-  <div class="search-input">
+  <form
+    class="search-input"
+    @submit.prevent.stop="onSubmit"
+  >
     <NInput
       v-model:value="searchUrl"
       type="text"
@@ -48,14 +51,14 @@ function onSubmit(): void {
     />
     <NButton
       type="primary"
-      @click="onSubmit"
+      attr-type="submit"
     >
       <NIcon
         size="20"
         :component="SearchOutline"
       />
     </NButton>
-  </div>
+  </form>
 </template>
 
 <style scoped lang="scss">

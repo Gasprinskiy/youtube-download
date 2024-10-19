@@ -69,6 +69,7 @@ function onDownloadClicked(): void {
             class="search-result__card_image"
             :src="data?.preview_url"
             object-fit="contain"
+            style="max-width: 100%;"
             lazy
           />
           <div class="search-result__card_data">
@@ -131,6 +132,26 @@ function onDownloadClicked(): void {
       &_download-options {
         display: flex;
         gap: 8px;
+      }
+    }
+  }
+
+  @media (max-width: 850px) {
+    .search-result {
+      &__card {
+        &_cover {
+          flex-direction: column;
+        }
+
+        &_image {
+          width: 100%;
+          min-width: 250px;
+          height: 250px;
+        }
+
+        &_data {
+          width: unset;
+        }
       }
     }
   }
