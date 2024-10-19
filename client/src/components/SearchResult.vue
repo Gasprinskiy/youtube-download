@@ -2,6 +2,10 @@
 import type { VNode } from 'vue';
 import { computed, h, shallowRef } from 'vue';
 
+import useVuelidate from '@vuelidate/core';
+import { required } from '@vuelidate/validators';
+
+import type { FormValidationStatus } from 'naive-ui/es/form/src/interface';
 import type { SelectOption } from 'naive-ui';
 import {
   NCard,
@@ -10,6 +14,7 @@ import {
   NSelect,
   NButton,
   NIcon,
+  useMessage,
 } from 'naive-ui';
 import { DownloadOutline } from '@vicons/ionicons5';
 
@@ -27,13 +32,23 @@ const emit = defineEmits<{
   }];
 }>();
 
+const message = useMessage();
+
 const fileName = shallowRef<string>(props.data.name);
+const fileNameNonFilled = shallowRef<boolean>(false);
 const chosenOptionID = shallowRef<string>(props.data.download_options[0].id);
 
 const downloadOptions = computed<SelectOption[]>(() => props.data.download_options.map(option => ({
   label: option.quality.toString(),
   value: option.id,
 })));
+const inputErrStatus = computed<FormValidationStatus>(() => fileNameNonFilled.value ? 'error' : 'success');
+
+const validateRules = {
+  fileName: { required },
+};
+
+const $v = useVuelidate(validateRules, { fileName });
 
 function renderLabel(option: SelectOption): VNode | undefined {
   const componentProps = props.data.download_options.find(item => item.id === option.value);
@@ -48,6 +63,14 @@ function renderLabel(option: SelectOption): VNode | undefined {
 }
 
 function onDownloadClicked(): void {
+  $v.value.$validate();
+
+  fileNameNonFilled.value = $v.value.$dirty && $v.value.$invalid;
+  if (fileNameNonFilled.value) {
+    message.error('Не введено название видео');
+    return;
+  }
+
   const chosenOption = props.data.download_options.find(option => option.id === chosenOptionID.value);
   if (!chosenOption) {
     return;
@@ -61,7 +84,10 @@ function onDownloadClicked(): void {
 </script>
 
 <template>
-  <div class="search-result">
+  <form
+    class="search-result"
+    @submit.prevent.stop="onDownloadClicked"
+  >
     <NCard class="search-result__card">
       <template #cover>
         <div class="search-result__card_cover">
@@ -77,6 +103,7 @@ function onDownloadClicked(): void {
               v-model:value="fileName"
               placeholder="Введите название"
               size="large"
+              :status="inputErrStatus"
             />
             <div class="search-result__card_download-options">
               <NSelect
@@ -87,7 +114,7 @@ function onDownloadClicked(): void {
               />
               <NButton
                 type="primary"
-                @click="onDownloadClicked"
+                attr-type="submit"
               >
                 <NIcon
                   :component="DownloadOutline"
@@ -99,7 +126,7 @@ function onDownloadClicked(): void {
         </div>
       </template>
     </NCard>
-  </div>
+  </form>
 </template>
 
 <style lang="scss" scoped>
