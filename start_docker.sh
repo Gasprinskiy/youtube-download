@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# echo "ERROR PAGE TEST"
+# echo "ERROR PAGE TEST"g
 
 cd ./nginx
 rm -rf dist
