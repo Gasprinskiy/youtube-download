@@ -1,4 +1,4 @@
-name: Deploy to Hetzner Client
+name: Deploy to Hetzner
 
 on:
   push:
