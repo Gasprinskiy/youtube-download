@@ -1,13 +1,20 @@
 import { getIDFromUrl } from './utils/url';
-import type { AppServiceVideoInfo, PrepareVideoParams } from './types';
+import type { AppServiceVideoInfo, DownloadSource, PrepareVideoParams } from './types';
 import { $api } from './lib';
 
 export function getDownloadOptions(
   url: string,
+  source?: DownloadSource,
   signal?: AbortSignal,
 ): Promise<AppServiceVideoInfo> {
   const id = getIDFromUrl(url);
-  return $api(`options/${id}`, { signal });
+  return $api('options', {
+    query: {
+      id,
+      source,
+    },
+    signal,
+  });
 }
 
 export function downloadVideo(

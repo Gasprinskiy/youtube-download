@@ -8,6 +8,7 @@ import { required, url } from '@vuelidate/validators';
 import type { FormValidationStatus } from 'naive-ui/es/form/src/interface';
 
 const emit = defineEmits<{
+  onInput: [value: string];
   onSubmit: [url: string];
 }>();
 
@@ -48,6 +49,7 @@ function onSubmit(): void {
       type="text"
       placeholder="Введите url видео"
       :status="inputErrStatus"
+      @input="emit('onInput', $event)"
     />
     <NButton
       type="primary"
