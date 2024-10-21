@@ -1,9 +1,19 @@
+export enum DownloadSource {
+  YouTube,
+  Instagram
+}
+
+export interface GetDownloadOptionsParams {
+  id: string
+  source?: DownloadSource
+}
+
 export interface AppServiceVideoDownloadOptions {
   id: string
   quality: number
   extension: string
-  size: number
-  fps: number
+  size: number | null
+  fps: number | null
 }
 
 export interface AppServiceVideoInfo {
@@ -17,6 +27,7 @@ export interface PrepareVideoParams {
   quality: string
   file_name: string
   device_fingerprint: string
+  source?: DownloadSource
 }
 
 export interface ParsedFormats {
@@ -28,4 +39,3 @@ export interface ParsedFormats {
   size: string | null
 }
 
-export type ParsedFormatsOmitSize = Omit<ParsedFormats, 'size'>
