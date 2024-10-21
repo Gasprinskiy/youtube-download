@@ -5,7 +5,8 @@ export enum DownloadSource {
 
 export interface GetDownloadOptionsParams {
   id: string
-  source?: DownloadSource
+  source: DownloadSource
+  device_fingerprint: string
 }
 
 export interface AppServiceVideoDownloadOptions {

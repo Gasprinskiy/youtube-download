@@ -3,23 +3,34 @@ import { Injectable } from '@nestjs/common';
 import { join } from 'path';
 import * as fs from 'node:fs/promises'
 
+import { getFirefoxProfilePath } from 'src/shared/utils/borwser-profile';
+
 import { PathToRoot } from '../shared/constants'
 import { FileLifeTime } from '../../shared/service/download/constants';
 import { youtubeDl } from '../../shared/youtube-dl';
 import { DownloadableFormatsIdMap } from '../../shared/youtube-dl/constants';
-import { AppServiceVideoDownloadOptions, AppServiceVideoInfo, DownloadSource, GetDownloadOptionsParams, PrepareVideoParams } from '../../shared/service/download/types';
-import { getFirefoxProfilePath } from 'src/shared/utils/borwser-profile';
+import {
+  AppServiceVideoDownloadOptions,
+  AppServiceVideoInfo,
+  DownloadSource,
+  GetDownloadOptionsParams,
+  PrepareVideoParams
+} from '../../shared/service/download/types';
+import axios from 'axios';
+import { getHostName } from 'src/shared/utils/env';
 
 
 @Injectable()
 export class DownloadsService {
 
   async getDownloadOptions(params: GetDownloadOptionsParams): Promise<AppServiceVideoInfo> {
-    const requiredParams = this.getRequiredGetDownloadOptionsParams(params)
-    const url = this.getUrl(requiredParams)
+    const { id, source } = params
+    const url = this.getUrl(params)
     const info = await this.getVideoFormats(url)
 
     const formats = info.formats as Array<any>
+
+    const preview_url = this.getPreviewUrl(params)
 
     const handlers: { [key in DownloadSource]: () => Promise<AppServiceVideoInfo> } = {
       [DownloadSource.YouTube]: async () => {
@@ -31,11 +42,9 @@ export class DownloadsService {
           return isSatisfyingQuality && isMp4 && isDownloadable
         })
 
-        const { id } = requiredParams
-
         return {
           name: info.title,
-          preview_url: this.getPreviewUrl(id),
+          preview_url,
           download_options: filteredDownloadOption.map<AppServiceVideoDownloadOptions>(item => ({
             id: `${id}-${item.format_id}`,
             quality: item.height,
@@ -49,7 +58,7 @@ export class DownloadsService {
       [DownloadSource.Instagram]: async () => {
         const filteredDownloadOption = []
         const filtered = formats.filter(item => {
-          const isSatisfyingQuality = item.width > 360
+          const isSatisfyingQuality = item.width > 540
           const isMp4 = item.ext === 'mp4'
 
           return isSatisfyingQuality && isMp4
@@ -64,12 +73,18 @@ export class DownloadsService {
           filteredDownloadOption.push(element)
         }
 
-        const { id } = requiredParams
-        const preview_url = await this.getInstagramPreviewImage(url)
+        const previewResponse = await axios.get(preview_url, { responseType: 'arraybuffer' })
+
+        const { device_fingerprint } = params
+        const fileName = `${id}-${device_fingerprint}.jpeg`
+        const filePath = join(__dirname, PathToRoot, `/uploads/${fileName}`)
+        await fs.writeFile(filePath, previewResponse.data)
+
+        queueMicrotask(() => this.setFileToRemove(filePath, 60000))
 
         return {
           name: info.title,
-          preview_url,
+          preview_url: `${getHostName()}/${fileName}`,
           download_options: filteredDownloadOption.map<AppServiceVideoDownloadOptions>(item => ({
             id: `${id}-${item.format_id}`,
             quality: item.width,
@@ -81,18 +96,16 @@ export class DownloadsService {
       }
     }
 
-    const { source } = requiredParams
     return handlers[source]()
   }
 
   async prepareVideo(params: PrepareVideoParams): Promise<Buffer> {
-    const { id, quality } = params
-    const requiredParams = this.getRequiredGetDownloadOptionsParams({
-      id,
-      source: params.source
-    })
+    const { id, quality, source } = params
 
-    const url = this.getUrl(requiredParams)
+    const url = this.getUrl({
+      id,
+      source
+    })
     const rootPath = this.getFileRootPath(params)
 
     const execQueryHandlers: { [key in DownloadSource]: () => string[] } = {
@@ -123,7 +136,6 @@ export class DownloadsService {
       }
     }
 
-    const { source } = requiredParams
     const execQuery = execQueryHandlers[source]()
 
     await youtubeDl.execPromise(execQuery)
@@ -131,15 +143,6 @@ export class DownloadsService {
     queueMicrotask(() => this.setFileToRemove(rootPath))
 
     return fs.readFile(rootPath)
-  }
-
-  private getInstagramPreviewImage(url: string): Promise<string> {
-    return youtubeDl.execPromise([
-      '--cookies-from-browser',
-      `firefox:${getFirefoxProfilePath()}`,
-      '--get-thumbnail',
-      url,
-    ])
   }
 
   private getFileRootPath(params: PrepareVideoParams): string {
@@ -174,18 +177,8 @@ export class DownloadsService {
     }
   }
 
-  private getRequiredGetDownloadOptionsParams(params: GetDownloadOptionsParams): Required<Partial<GetDownloadOptionsParams>> {
+  private getUrl(params: Omit<GetDownloadOptionsParams, 'device_fingerprint'>): string {
     const { id, source } = params
-    const downloadSource = source || DownloadSource.YouTube
-    return {
-      id,
-      source: downloadSource
-    }
-  }
-
-  private getUrl(params: Required<Partial<GetDownloadOptionsParams>>): string {
-    const { id, source } = params
-    console.log('source: ', source === DownloadSource.Instagram);
 
     switch (source) {
       case DownloadSource.YouTube:
@@ -196,13 +189,21 @@ export class DownloadsService {
     }
   }
 
-  private getPreviewUrl(id: string): string {
-    return `http://i3.ytimg.com/vi/${id}/hqdefault.jpg`
+  private getPreviewUrl(params: GetDownloadOptionsParams): string {
+    const { id, source } = params
+
+    switch (source) {
+      case DownloadSource.YouTube:
+        return `http://i3.ytimg.com/vi/${id}/hqdefault.jpg`
+
+      case DownloadSource.Instagram:
+        return `https://instagram.com/p/${id}/media?size=l`
+    }
   }
 
-  private setFileToRemove(file_path: string): void {
+  private setFileToRemove(file_path: string, lifeTime?: number): void {
     setTimeout(async () => {
       await fs.unlink(file_path)
-    }, FileLifeTime)
+    }, lifeTime || FileLifeTime)
   }
 }
