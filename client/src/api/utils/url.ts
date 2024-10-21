@@ -1,12 +1,14 @@
 export function getIDFromUrl(url: string): string | undefined {
-  const videoRegex = /(?<=v=)[^&]+/g;
-  const shortsRegex = /shorts\/([^/?]+)/;
-  let match = videoRegex.exec(url);
+  const regexArray = [/(?<=v=)[^&]+/g, /shorts\/([^/?]+)/, /reel\/([^/?]+)/];
 
-  if (match) {
-    return match[0];
+  let match: RegExpExecArray | null = null;
+
+  for (const element of regexArray) {
+    if (match) {
+      break;
+    }
+    match = element.exec(url);
   }
 
-  match = shortsRegex.exec(url);
-  return match?.[1];
+  return match?.[0].replace('reel/', '');
 }

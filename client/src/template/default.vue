@@ -1,38 +1,19 @@
 <script setup lang="ts">
-import { shallowRef } from 'vue';
-
 import {
   NLoadingBarProvider,
   NConfigProvider,
   NNotificationProvider,
   NMessageProvider,
   NGlobalStyle,
-  NLayoutHeader,
   NScrollbar,
-  NSwitch,
-  NIcon,
-
-  darkTheme,
-  lightTheme,
 } from 'naive-ui';
-import type { BuiltInGlobalTheme } from 'naive-ui/es/themes/interface';
-import { MoonOutline, SunnyOutline, LogoYoutube } from '@vicons/ionicons5';
 
-const currentThemeSwitchValue = shallowRef<boolean>(true);
-const currentTheme = shallowRef<BuiltInGlobalTheme>(darkTheme);
-const isLightTheme = shallowRef<boolean>(false);
+import AppHeader from '../components/AppHeader.vue';
+import { useAppTheme } from '../composables/use-app-theme';
+import { useDownloadSource } from '../composables/use-download-source';
 
-function onChangeTheme(value: boolean): void {
-  currentTheme.value = value ? darkTheme : lightTheme;
-
-  if (currentTheme.value.name === 'light') {
-    setTimeout(() => {
-      isLightTheme.value = true;
-    }, 200);
-    return;
-  }
-  isLightTheme.value = false;
-}
+const { currentTheme, setCurrentTheme } = useAppTheme();
+const { currentSource, setCurrentSource } = useDownloadSource();
 </script>
 
 <template>
@@ -41,35 +22,12 @@ function onChangeTheme(value: boolean): void {
       <NNotificationProvider placement="top-left">
         <NMessageProvider placement="bottom">
           <div class="app-container">
-            <NLayoutHeader
-              class="app-container__header"
-              :class="{ outlined: isLightTheme }"
-            >
-              <h1 class="app-container__title">
-                Скачать из
-                <span>
-                  <NIcon
-                    :component="LogoYoutube"
-                    size="30"
-                  />
-                  YouTube
-                </span>
-              </h1>
-
-              <NSwitch
-                v-model:value="currentThemeSwitchValue"
-                size="large"
-                @update-value="onChangeTheme"
-              >
-                <template #checked-icon>
-                  <NIcon :component="MoonOutline" />
-                </template>
-
-                <template #unchecked-icon>
-                  <NIcon :component="SunnyOutline" />
-                </template>
-              </NSwitch>
-            </NLayoutHeader>
+            <AppHeader
+              :key="currentSource"
+              :current-source="currentSource"
+              @on-change-theme="setCurrentTheme"
+              @on-change-source="setCurrentSource"
+            />
 
             <div class="app-container__inner">
               <NScrollbar>
@@ -88,31 +46,6 @@ function onChangeTheme(value: boolean): void {
 <style lang="scss" scoped>
   .app-container {
     width: 100%;
-
-    &__header {
-      padding: 10px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      &.outlined {
-        outline: 1px solid rgb(239, 239, 245);
-      }
-    }
-
-    &__title {
-      padding: 0;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      font-weight: 500;
-      gap: 8px;
-      span {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        font-weight: 600;
-      }
-    }
 
     &__inner {
       max-width: 1000px;
