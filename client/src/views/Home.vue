@@ -7,16 +7,18 @@ import { NButton, NCard, NCollapseTransition, useMessage, useNotification } from
 
 import SearchInput from '../components/SearchInput.vue';
 import { downloadVideo, getDownloadOptions } from '../api';
-import type { AppServiceVideoDownloadOptions, AppServiceVideoInfo } from '../api/types';
+import { DownloadSource, type AppServiceVideoDownloadOptions, type AppServiceVideoInfo, type PrepareVideoParams } from '../api/types';
 import SearchResult from '../components/SearchResult.vue';
 import { downloadBlob } from '../shared/utils/download';
 import { useApiRequest } from '../composables/use-api-request.ts';
+import { useDownloadSource } from '../composables/use-download-source/index.ts';
 
 const abortTitle = 'Прервать';
 
 const notification = useNotification();
 const message = useMessage();
 const { handleRequest, abortRequest } = useApiRequest();
+const { currentSource, setCurrentSource } = useDownloadSource();
 
 const data = shallowRef<AppServiceVideoInfo | null>(null);
 const currentUrl = shallowRef<string>('');
@@ -26,7 +28,11 @@ const inProgressNotification = shallowRef<NotificationReactive>();
 
 async function onInputSubmit(url: string): Promise<void> {
   handleRequest({
-    request: (signal?: AbortSignal) => getDownloadOptions(url, signal),
+    request: (signal?: AbortSignal) => getDownloadOptions(
+      url,
+      currentSource.value,
+      signal,
+    ),
 
     beforeRequestStart: () => {
       inProgressMessage.value = 'Идет поиск видео';
@@ -70,10 +76,14 @@ async function onDownloadClicked(result: {
 
   handleRequest({
     request: (signal?: AbortSignal) => {
-      const params = {
-        id: option.id,
+      const isYoutube = currentSource.value === DownloadSource.YouTube;
+      const id = isYoutube ? option.id : option.id.split('-')[0];
+
+      const params: PrepareVideoParams = {
+        id,
         quality: option.quality,
         file_name: fileName,
+        source: currentSource.value,
       };
       return downloadVideo(params, signal);
     },
@@ -122,6 +132,23 @@ function renderNotificationActionButton(
     default: () => title,
   });
 };
+
+function changeSourceOnInput(value: string): void {
+  const sourceStringList: string[] = [
+    DownloadSource[DownloadSource.YouTube].toLowerCase(),
+    DownloadSource[DownloadSource.Instagram].toLowerCase(),
+  ];
+
+  switch (true) {
+    case value.includes(sourceStringList[0]):
+      setCurrentSource(DownloadSource.YouTube);
+      break;
+
+    case value.includes(sourceStringList[1]):
+      setCurrentSource(DownloadSource.Instagram);
+      break;
+  }
+}
 </script>
 
 <template>
@@ -129,6 +156,7 @@ function renderNotificationActionButton(
     <NCard class="home-view__search-input">
       <SearchInput
         @on-submit="onInputSubmit"
+        @on-input="changeSourceOnInput"
       />
     </NCard>
 
@@ -136,6 +164,7 @@ function renderNotificationActionButton(
       <SearchResult
         v-if="data"
         :data="data"
+        :source="currentSource"
         @on-download-clicked="onDownloadClicked"
       />
     </NCollapseTransition>

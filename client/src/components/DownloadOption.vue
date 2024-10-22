@@ -1,54 +1,63 @@
 <script lang="ts" setup>
+import type { Component } from 'vue';
 import { computed } from 'vue';
 
 import { NIcon } from 'naive-ui';
-import { LogoYoutube } from '@vicons/ionicons5';
+import { LogoYoutube, LogoInstagram } from '@vicons/ionicons5';
 
-import type { AppServiceVideoDownloadOptions } from '../api/types';
+import { type AppServiceVideoDownloadOptions, DownloadSource } from '../api/types';
+import OptionTemplate from './template/OptionTemplate.vue';
 
-const props = defineProps<AppServiceVideoDownloadOptions>();
+const props = defineProps<
+AppServiceVideoDownloadOptions & { source?: DownloadSource }
+>();
 
-const title = computed<string>(() => `${props.quality}p/${props.fps}FPS[${props.extension}]`);
-const formattedSize = computed<string>(() => {
+const iconComponent = computed<Component>(() => {
+  switch (props.source) {
+    case DownloadSource.YouTube:
+      return LogoYoutube;
+
+    case DownloadSource.Instagram:
+      return LogoInstagram;
+
+    default:
+      return LogoYoutube;
+  }
+});
+const title = computed<string>(() => {
+  if (!props.fps) {
+    return `${props.quality}p [${props.extension}]`;
+  }
+  return `${props.quality}p/${props.fps}FPS[${props.extension}]`;
+});
+const formattedSize = computed<string | undefined>(() => {
+  if (!props.size) {
+    return;
+  }
+
   const size = Math.floor(props.size / 1_000_000);
   return `~ ${size} МБ`;
 });
 </script>
 
 <template>
-  <div class="download-option">
-    <div class="download-option__title">
+  <OptionTemplate class="download-option">
+    <template #title>
       <NIcon
-        :component="LogoYoutube"
+        :component="iconComponent"
         size="20"
       />
       <span>{{ title }}</span>
-    </div>
-    <div class="download-option__size">
-      {{ formattedSize }}
-    </div>
-  </div>
+    </template>
+    <template #subcontent>
+      <div v-if="formattedSize" class="download-option__size">
+        {{ formattedSize }}
+      </div>
+    </template>
+  </OptionTemplate>
 </template>
 
 <style lang="scss" scoped>
-  .download-option {
-    display: flex;
-    justify-content: space-between;
-
-    &__title,
-    &__size {
-      font-weight: 300;
-      font-size: 15px;
-      line-height: 20px;
-    }
-
-    &__title {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-  }
-
   @media (max-width: 370px) {
     .download-option {
       &__size {

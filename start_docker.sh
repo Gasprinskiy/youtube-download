@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "ERROR PAGE TEST"
-
 cd ./nginx
 rm -rf dist
 
