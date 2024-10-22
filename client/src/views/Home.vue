@@ -164,6 +164,7 @@ function changeSourceOnInput(value: string): void {
       <SearchResult
         v-if="data"
         :data="data"
+        :source="currentSource"
         @on-download-clicked="onDownloadClicked"
       />
     </NCollapseTransition>

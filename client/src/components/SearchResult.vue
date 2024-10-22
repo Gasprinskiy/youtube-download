@@ -19,10 +19,11 @@ import {
 import { DownloadOutline } from '@vicons/ionicons5';
 
 import DownloadOption from '../components/DownloadOption.vue';
-import type { AppServiceVideoInfo, AppServiceVideoDownloadOptions } from '../api/types';
+import type { AppServiceVideoInfo, AppServiceVideoDownloadOptions, DownloadSource } from '../api/types';
 
 const props = defineProps<{
   data: AppServiceVideoInfo;
+  source: DownloadSource;
 }>();
 
 const emit = defineEmits<{
@@ -59,6 +60,7 @@ function renderLabel(option: SelectOption): VNode | undefined {
   return h(DownloadOption, {
     style: 'width: 100%',
     ...componentProps,
+    source: props.source,
   });
 }
 
