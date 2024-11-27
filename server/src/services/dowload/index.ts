@@ -111,6 +111,7 @@ export class DownloadsService {
     const execQueryHandlers: { [key in DownloadSource]: () => string[] } = {
       [DownloadSource.YouTube]: () => {
         return [
+          '--verbose',
           '--cookies-from-browser',
           `firefox:${getFirefoxProfilePath()}`,
           url,
@@ -137,8 +138,10 @@ export class DownloadsService {
     }
 
     const execQuery = execQueryHandlers[source]()
+    console.log('execQuery: ', execQuery);
 
-    await youtubeDl.execPromise(execQuery)
+    const logs = await youtubeDl.execPromise(execQuery)
+    console.log('ytdl logs: ', logs);
 
     queueMicrotask(() => this.setFileToRemove(rootPath))
 
